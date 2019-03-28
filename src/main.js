@@ -2,6 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import VueCodemirror from 'vue-codemirror'
 import VueFire from 'vuefire'
+import VModal from 'vue-js-modal'
+
+Vue.use(VModal)
 Vue.use(VueFire)
 
 // require styles
