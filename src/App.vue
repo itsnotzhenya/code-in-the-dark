@@ -1,41 +1,19 @@
 <template class="template">
-  <div id="app">
+  <div id="app" v-on:keyup="push">
     <div class="background" @click="onFocus"></div>
-    <!-- TODO: разбить на компоненты и вынести модалки -->
-    <!-- <modal name="inputName" :width="250" :height="100">
-      <div class="modal-mask">
-        <div slot="bottom-right">
-          <button class="ok" @click="closed()">✔️</button>
-        </div>
-        <input
-          class="inputName"
-          type="text"
-          v-model="newUser.nameUser"
-          id="contactName"
-          placeholder="Your name"
-        >
+    <modal-input-name v-if="showInput" v-on:savename="saveName"></modal-input-name>
+    <modal-instructions v-if="showInstruction" v-on:showeditor="showeditor"></modal-instructions>
+    <codemirror
+      v-if="showCodemirror"
+      class="codemirror"
+      ref="cm"
+      v-model="newUser.codeUser"
+      :options="cmOption"
+      width="800"
+    ></codemirror>
+      <div class="countdown">
+        <h2>{{ timeLeft }}</h2>
       </div>
-    </modal>-->
-    <!-- <modal name="instructions" :width="470" :height="200">
-      <pre class="instructions">
-        --- The rules ---
-1) No previews - of either results or assets!
-2) Stay in this editor at all times
-3) No measurement tools
-4) Stop coding when the time's up
-5) After the round is over, press "Finish" and follow the 
-prompt instructions to see your results
-
-Good luck and most important of all; have fun!
-      </pre>
-      <button class="ok" @click="start()">Начать ✔️</button>
-    </modal>-->
-    <modal-input-name @nameUser="nameUser"></modal-input-name>
-    <modal-instructions></modal-instructions>
-    <codemirror class="codemirror" v-model="newUser.codeUser" :options="cmOption" width="800"></codemirror>
-    <div class="countdown">
-      <h2>{{ timeLeft }}</h2>
-    </div>
     <ul style="position: absolute; disply: inline-block">
       <li v-for="(time, index) in times" :key="index" class="column time">
         <a
@@ -122,6 +100,9 @@ export default {
   },
   data() {
     return {
+      showInput: false,
+      showInstruction: false,
+      showCodemirror: false,
       selectedTime: 0, //зачеm это нужно?
       timeLeft: "00:00",
       times: [
@@ -150,17 +131,33 @@ export default {
   },
   mounted() {
     // this.opened();
+    this.showInput = true;
   },
   methods: {
-    onFocus() {},
-    nameUser(name) {
-      this.newUser.nameUser = name;
+    onFocus() {
+      // this.$refs.cm.cm.focus();
     },
+    saveName(name) {
+      this.newUser.nameUser = name;
+      // this.showCodemirror = true;
+      this.showInstruction = true;
+    },
+    showeditor(showEditor){
+      this.showCodemirror = showEditor;
+      // alert('sdf');
+      // if(showInstruction){   showCodemirror = true;}
+      // alert('')
+      // showCodemirror = true;
+      // event.stop();
+    },
+    push() {},
     done() {
       usersRef.push(this.newUser);
-      this.newUser.nameUser = "";
-      this.newUser.codeUser = "";
       toastr.success("you have completed the task");
+      this.clear();
+    },
+    clear() {
+      this.newUser.nameUser = this.newUser.codeUser = "";
     },
     confirmation() {
       //подтверждение при нажатии кнопки "готово"
@@ -178,12 +175,15 @@ export default {
       //   alert("Требуется указать имя.");
       //   return 0;
       // } else console.log(this.nameUser);
-      this.$modal.hide("inputName");
-      this.$modal.show("instructions");
+      // this.$modal.hide("inputName");
+      // this.$modal.show("instructions");
+      this.showInput = false;
+      this.showInstruction = true;
       // e.preventDefault();
     },
     start() {
       this.$modal.hide("instructions");
+      // alert('dfkjgdfn');
       //timer start
     },
     showImage() {
@@ -342,11 +342,11 @@ body {
 .v--modal-box .v--modal {
   z-index: 9999;
 }
-.ok {
+/* .ok {
   position: absolute;
   right: 10px;
   bottom: 10px;
-}
+} */
 .instructions {
   margin: 10px;
 }
@@ -378,10 +378,11 @@ img:hover {
 .countdown {
   font-family: "Press Start 2P", sans-serif;
   text-align: right;
-  margin: 5px 0 30px;
-  position: absolute;
+  /* position: absolute; */
+  position: fixed;
   color: #fff;
   right: 27px;
+  top: -30px;
 }
 
 h2 {
