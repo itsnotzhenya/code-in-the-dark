@@ -1,20 +1,23 @@
 <template>
-  <modal name="inputName" :width="300" :height="80">
-    <div class="modal-mask">
-      <div slot="bottom-right">
-        <button class="ok" @click="closed()">
-          <i class="fas fa-check"></i>
-        </button>
+  <div @click.prevent="checkInput()">
+    <modal :clickToClose="false" name="inputName" :width="300" :height="80">
+      <div class="modal-mask">
+        <input
+          class="inputName"
+          v-model="nameUser"
+          type="text"
+          id="contactName"
+          placeholder="Your name"
+          autocomplete="off"
+        >
+        <div slot="bottom-right">
+          <button class="ok" @click="closed()">
+            <i class="fas fa-check"></i>
+          </button>
+        </div>
       </div>
-      <input
-        class="inputName"
-        v-model="nameUser"
-        type="text"
-        id="contactName"
-        placeholder="Your name"
-      >
-    </div>
-  </modal>
+    </modal>
+  </div>
 </template>
 
 <script>
@@ -30,13 +33,21 @@ export default {
       this.$modal.show("inputName");
     },
     closed() {
+      if (this.nameUser == "") {
+        this.checkInput();
+        return;
+      }
       this.$modal.hide("inputName");
-      // console.log(this.nameUser);
       this.$emit("savename", this.nameUser);
+    },
+    checkInput() {
+      let input = document.getElementById("contactName");
+      if (this.nameUser == "") {
+        input.classList.add("require");
+      } else input.classList.remove("require");
     }
   },
   mounted() {
-    // this.$emit("opened", this.opened());
     this.opened();
   }
 };
@@ -52,9 +63,20 @@ export default {
   width: 200px;
   height: 37px;
   margin: 20px;
+  padding-left: 5px;
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  border: 1px solid rgba(81, 203, 238, 1);
+}
+.inputName:focus {
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  border: 1px solid rgba(81, 203, 238, 1);
 }
 .inputName::placeholder {
   color: #000;
+}
+.require {
+  box-shadow: 0 0 5px rgba(255, 0, 0, 0.4);
+  border: 1px solid rgba(255, 0, 0, 0.4);
 }
 .ok {
   position: absolute;

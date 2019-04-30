@@ -1,6 +1,6 @@
 <template>
   <div class="modal">
-    <modal name="instructions" :width="450" :height="210">
+    <modal :clickToClose="false" name="instructions" :width="450" :height="210">
       <pre class="instructions">
                       --- The rules ---
     1) No previews - of either results or assets!
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { all } from "q";
 export default {
   name: "instructions",
   data() {
@@ -36,12 +37,11 @@ export default {
     },
     start() {
       this.closed();
-      this.$emit('showeditor', this.showEditor)
-
+      this.$emit("showeditor", this.showEditor);
     }
   },
   mounted() {
-   this.opened()
+    this.opened();
   }
 };
 </script>

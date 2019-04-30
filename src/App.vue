@@ -2,7 +2,7 @@
   <div id="app" v-on:keyup="push">
     <div class="background" @click="onFocus"></div>
     <modal-input-name v-if="showInput" v-on:savename="saveName"></modal-input-name>
-    <modal-instructions v-if="showInstruction" v-on:showeditor="showeditor"></modal-instructions>
+    <modal-instructions ref="instruct" v-if="showInstruction" v-on:showeditor="showeditor"></modal-instructions>
     <codemirror
       v-if="showCodemirror"
       class="codemirror"
@@ -11,19 +11,17 @@
       :options="cmOption"
       width="800"
     ></codemirror>
-      <div class="countdown">
-        <h2>{{ timeLeft }}</h2>
-      </div>
+    <div class="countdown">
+      <h2>{{ timeLeft }}</h2>
+    </div>
     <ul style="position: absolute; disply: inline-block">
-      <li v-for="(time, index) in times" :key="index" class="column time">
+      <li class="column time">
         <a
-          v-on:click.prevent="setTime(time.sec)"
+          v-on:click.prevent="setTime(times.sec)"
           :class="[
                 'button',
-                'is-link',
-                {'is-active': time.sec === selectedTime && endTime !== 0 }
               ]"
-        >{{ time.display }}</a>
+        >{{ times.display }}</a>
       </li>
     </ul>
 
@@ -38,12 +36,7 @@
     </div>
     <div class="buttons">
       <input class="button" type="submit" value="Finish" @click="confirmation()">
-      <input
-        class="button"
-        type="submit"
-        value="Instructions"
-        @click="this.$modal.show('instructions')"
-      >
+      <input class="button" type="submit" value="Instructions" @click="$refs.instruct.opened()">
     </div>
   </div>
 </template>
@@ -105,12 +98,10 @@ export default {
       showCodemirror: false,
       selectedTime: 0, //зачеm это нужно?
       timeLeft: "00:00",
-      times: [
-        {
-          sec: 15,
-          display: "start"
-        }
-      ],
+      times: {
+        sec: 15,
+        display: "start"
+      },
       fullWidthImage: false,
       errors: [],
       newUser: {
@@ -142,7 +133,7 @@ export default {
       // this.showCodemirror = true;
       this.showInstruction = true;
     },
-    showeditor(showEditor){
+    showeditor(showEditor) {
       this.showCodemirror = showEditor;
       // alert('sdf');
       // if(showInstruction){   showCodemirror = true;}
@@ -200,7 +191,7 @@ export default {
 
       this.selectedTime = seconds;
       // this.initialTime = seconds;
-      this.displayEndTime(end);
+      // this.displayEndTime(end);
       this.countdown(end);
     },
     countdown(end) {
@@ -225,13 +216,6 @@ export default {
       const seconds = secondsLeft % 60;
 
       this.timeLeft = `${this.zeroPadded(minutes)}:${this.zeroPadded(seconds)}`;
-    },
-    displayEndTime(timestamp) {
-      const end = new Date(timestamp);
-      const hour = end.getHours();
-      const minutes = end.getMinutes();
-
-      this.endTime = `${this.hourConvert(hour)}:${this.zeroPadded(minutes)}`;
     },
     zeroPadded(num) {
       // 4 --> 04
