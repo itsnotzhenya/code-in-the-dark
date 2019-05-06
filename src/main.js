@@ -4,7 +4,9 @@ import VueCodemirror from 'vue-codemirror'
 import VueFire from 'vuefire'
 import VModal from 'vue-js-modal'
 import store from './store/index.js'
+import VueRouter from 'vue-router'
 
+Vue.use(VueRouter)
 Vue.use(VModal)
 Vue.use(VueFire)
 

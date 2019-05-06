@@ -12,7 +12,7 @@
 
     Good luck and most important of all; have fun!
       </pre>
-      <button class="ok" @click="start()">
+      <button id="start" class="ok" @click="start()">
         <i class="fas fa-check"></i>
       </button>
     </modal>
@@ -20,12 +20,12 @@
 </template>
 
 <script>
-import { all } from "q";
 export default {
   name: "instructions",
   data() {
     return {
-      showEditor: true
+      showEditor: true,
+      timerStart: true
     };
   },
   methods: {
@@ -38,6 +38,10 @@ export default {
     start() {
       this.closed();
       this.$emit("showeditor", this.showEditor);
+      if (this.timerStart) {
+        this.$emit("start");
+        this.timerStart = false;
+      }
     }
   },
   mounted() {
@@ -46,7 +50,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .ok {
   position: absolute;
   right: 190px;

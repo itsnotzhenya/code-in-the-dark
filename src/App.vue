@@ -2,7 +2,13 @@
   <div id="app" v-on:keyup="push">
     <div class="background" @click="onFocus"></div>
     <modal-input-name v-if="showInput" v-on:savename="saveName"></modal-input-name>
-    <modal-instructions ref="instruct" v-if="showInstruction" v-on:showeditor="showeditor"></modal-instructions>
+    <modal-instructions
+      @start="timer(seconds)"
+      ref="instruct"
+      v-if="showInstruction"
+      v-on:showeditor="showeditor"
+    ></modal-instructions>
+    <!-- <div class="code" v-html="newUser.codeUser"></div> -->
     <codemirror
       v-if="showCodemirror"
       class="codemirror"
@@ -11,22 +17,13 @@
       :options="cmOption"
       width="800"
     ></codemirror>
+    <!-- <div class="users" v-for="user in users" :key="user.id" style="color:white">
+      <p>{{ user.nameUser }}</p>
+    </div>-->
     <div class="countdown">
       <h2>{{ timeLeft }}</h2>
     </div>
-    <ul style="position: absolute; disply: inline-block">
-      <li class="column time">
-        <a
-          v-on:click.prevent="setTime(times.sec)"
-          :class="[
-                'button',
-              ]"
-        >{{ times.display }}</a>
-      </li>
-    </ul>
-
     <div class="assetImg">
-      <!-- <img id="myimg" alt="asset image" @click="showIage()"> -->
       <img
         id="myimg"
         :class="{ full: fullWidthImage }"
@@ -45,6 +42,7 @@
 //components
 import ModalInputName from "./components/ModalInputName.vue";
 import ModalInstructions from "./components/ModalInstructions.vue";
+import Result from "./components/Result.vue";
 
 // language
 import "codemirror/mode/xml/xml.js";
@@ -55,7 +53,6 @@ import "codemirror/addon/edit/closetag.js";
 
 import Firebase from "firebase";
 import toastr from "toastr";
-// import { constants } from "fs"; хз зачем
 let config = {
   apiKey: "AIzaSyDWZvyI83vGieUtviHwaNeEq802ekbRjrc",
   authDomain: "code-19f91.firebaseapp.com",
@@ -89,21 +86,19 @@ export default {
   firebase: { users: usersRef },
   components: {
     ModalInputName,
-    ModalInstructions
+    ModalInstructions,
+    Result
   },
   data() {
     return {
       showInput: false,
       showInstruction: false,
       showCodemirror: false,
-      selectedTime: 0, //зачеm это нужно?
+      seconds: 10,
       timeLeft: "00:00",
-      times: {
-        sec: 15,
-        display: "start"
-      },
       fullWidthImage: false,
       errors: [],
+      nameUser: "",
       newUser: {
         nameUser: "",
         codeUser: ""
@@ -116,12 +111,12 @@ export default {
         autoCloseTags: true,
         collapseIdentical: false,
         highlightDifferences: true,
-        viewportMargin: Infinity
+        viewportMargin: Infinity,
+        lineWrapping: true
       }
     };
   },
   mounted() {
-    // this.opened();
     this.showInput = true;
   },
   methods: {
@@ -130,73 +125,38 @@ export default {
     },
     saveName(name) {
       this.newUser.nameUser = name;
-      // this.showCodemirror = true;
       this.showInstruction = true;
     },
     showeditor(showEditor) {
       this.showCodemirror = showEditor;
-      // alert('sdf');
-      // if(showInstruction){   showCodemirror = true;}
-      // alert('')
-      // showCodemirror = true;
-      // event.stop();
     },
     push() {},
     done() {
       usersRef.push(this.newUser);
       toastr.success("you have completed the task");
+      this.nameUser = this.newUser.nameUser;
       this.clear();
+      this.showResult();
     },
     clear() {
       this.newUser.nameUser = this.newUser.codeUser = "";
     },
     confirmation() {
-      //подтверждение при нажатии кнопки "готово"
       let conf = confirm("Do you want to complete?");
       if (conf) {
         this.done();
       } else return;
     },
-    opened() {
-      // this.$modal.show("inputName");
-      this.$refs.modalInput.open();
-    },
-    closed() {
-      // if (this.nameUser === undefined) {
-      //   alert("Требуется указать имя.");
-      //   return 0;
-      // } else console.log(this.nameUser);
-      // this.$modal.hide("inputName");
-      // this.$modal.show("instructions");
-      this.showInput = false;
-      this.showInstruction = true;
-      // e.preventDefault();
-    },
-    start() {
-      this.$modal.hide("instructions");
-      // alert('dfkjgdfn');
-      //timer start
-    },
-    showImage() {
-      // TODO: увеличение картинки при нажатии
-    },
-    setTime(seconds) {
-      clearInterval(this.intervalTimer);
-      this.timer(seconds);
-    },
+    showResult() {},
     timer(seconds) {
       const now = Date.now();
       const end = now + seconds * 1000;
       this.displayTimeLeft(seconds);
 
       this.selectedTime = seconds;
-      // this.initialTime = seconds;
-      // this.displayEndTime(end);
       this.countdown(end);
     },
     countdown(end) {
-      //отсчет времени
-      // this.initialTime = this.selectedTime;
       this.intervalTimer = setInterval(() => {
         const secondsLeft = Math.round((end - Date.now()) / 1000);
 
@@ -326,35 +286,29 @@ body {
 .v--modal-box .v--modal {
   z-index: 9999;
 }
-/* .ok {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-} */
 .instructions {
   margin: 10px;
 }
 .assetImg {
-  position: absolute;
+  position: fixed;
   right: 20px;
   bottom: 70px;
   z-index: 1035;
-  /* height: 160px; */
 }
-/* .assetImg img {
-  max-width: 150px;
-} */
-
 .full {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 100%;
   height: auto;
+  /* z-index: 1035; */
 }
 img {
   width: 150px;
   border-radius: 2px;
   box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.5);
-  /* transition: width 1s; */
 }
+
 img:hover {
   cursor: pointer;
 }
@@ -362,7 +316,6 @@ img:hover {
 .countdown {
   font-family: "Press Start 2P", sans-serif;
   text-align: right;
-  /* position: absolute; */
   position: fixed;
   color: #fff;
   right: 27px;
@@ -371,30 +324,12 @@ img:hover {
 
 h2 {
   font-size: 60px;
-  /* width: 390px; */
   line-height: 1;
   text-align: center;
-  /* font-family: "Press  Start 2P", sans-serif; */
 }
-h3 {
-  font-size: 18px;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  /* font-family: "Press  Start 2P", sans-serif; */
-}
-h3 span {
-  width: 70px;
-  border-bottom: 2px solid hsl(348, 100%, 71%);
-  margin-left: 15px;
-  text-align: center;
-}
+
 .time {
   display: flex;
   justify-content: center;
-}
-ul {
-  right: 10px;
-  bottom: 60vh;
 }
 </style>
