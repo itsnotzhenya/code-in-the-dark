@@ -13,9 +13,10 @@ Vue.use(VueFire)
 
 
 const router = new VueRouter({
+  mode: 'history',
   routes: [
     { path: "", component: Main },
-    { path: "/result", component: Result }
+    { path: "/result/:id", component: Result }
   ]
 });
 

@@ -51,6 +51,10 @@ export default {
 </script>
 
 <style scoped>
+.modal {
+  z-index: 99999;
+  position: relative;
+}
 .ok {
   position: absolute;
   right: 190px;

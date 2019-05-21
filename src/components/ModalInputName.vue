@@ -33,10 +33,12 @@ export default {
       this.$modal.show("inputName");
     },
     closed() {
+      let date = new Date().getTime();
       if (this.nameUser == "") {
         this.checkInput();
         return;
       }
+      this.nameUser += date;
       this.$modal.hide("inputName");
       this.$emit("savename", this.nameUser);
     },
@@ -44,7 +46,9 @@ export default {
       let input = document.getElementById("contactName");
       if (this.nameUser == "") {
         input.classList.add("require");
-      } else input.classList.remove("require");
+      } else {
+        input.classList.remove("require");
+      }
     }
   },
   mounted() {
