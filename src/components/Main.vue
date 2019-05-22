@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <div id="background" class="background"></div>
+    <div id="background" class="background">
+      <!-- <img  id="bg" src="../../img/logo4.png"> -->
+    </div>
     <modal-input-name v-if="showInput" v-on:savename="saveName"></modal-input-name>
     <modal-instructions
       @start="timer(seconds)"
@@ -8,37 +10,30 @@
       v-if="showInstruction"
       v-on:showeditor="showeditor"
     ></modal-instructions>
-    <div class="Counter" @keydown.exact="combo">
-      <codemirror
-        v-on:keyup="combo"
+    <div class="counter" @keydown.exact="combo">
+      <!-- <codemirror
         v-if="showCodemirror"
         class="codemirror"
         ref="cm"
         v-model="newUser.codeUser"
         :options="cmOption"
         width="800"
-      ></codemirror>
+      ></codemirror> -->
+    <editor id="editor" v-model="newUser.codeUser" @init="editorInit" lang="html" theme="monokai"></editor>
     </div>
+    <div class="nameTag">{{ newUser.nameUser }}</div>
 
     <div class="countdown">
       <h2>{{ timeLeft }}</h2>
     </div>
-    <div class="nameTag">{{ newUser.nameUser }}</div>
     <div class="combo">
       <p>Combo</p>
-      <div class="count" id="count">{{ countSymbols }}</div>
-      <div class="bar" id="bar"></div>
+      <div class="countClass" id="count">{{ countSymbols }}</div>
+      <div class="barClass" id="bar"></div>
       <div id="exclamations" class="exclamations">
-        <span id="span">{{ exclamations[exclamation] }}</span>
+        <span id="outputExclamation">{{ exclamationList[exclamation] }}</span>
       </div>
     </div>
-    <!-- <div class="reference-container">
-      <div
-        class="reference-screenshot"
-        style="background-image:url(../img/wG032WYr0zs.jpg);"
-        @click="fullImg"
-      ></div>
-    </div>-->
     <div class="assetImg">
       <img
         id="myimg"
@@ -46,7 +41,6 @@
         @click="fullWidthImage = !fullWidthImage"
         alt
       >
-      <!-- <img id="myimg"> -->
     </div>
     <div class="buttons">
       <input class="button" type="submit" value="Finish" @click="confirmation()">
@@ -58,7 +52,6 @@
 <script>
 import ModalInputName from "./ModalInputName.vue";
 import ModalInstructions from "./ModalInstructions.vue";
-
 // language
 import "codemirror/mode/xml/xml.js";
 // theme css
@@ -75,7 +68,8 @@ export default {
   firebase: { users: usersRef },
   components: {
     ModalInputName,
-    ModalInstructions
+    ModalInstructions,
+    editor: require('vue2-ace-editor'),
   },
   data() {
     return {
@@ -111,7 +105,7 @@ export default {
         "F12"
       ],
       keyTimeout: null,
-      exclamations: [
+      exclamationList: [
         "Super!",
         "Radical!",
         "Fantastic!",
@@ -120,7 +114,7 @@ export default {
         "Whoah!",
         ":O",
         "Nice!",
-        "Splendid!",
+        "Molodec!",
         "Wild!",
         "Grand!",
         "Impressive!",
@@ -148,7 +142,8 @@ export default {
         collapseIdentical: false,
         highlightDifferences: true,
         viewportMargin: Infinity,
-        lineWrapping: true
+        lineWrapping: true,
+        blastCode: { effect: 2 }
       }
     };
   },
@@ -157,6 +152,17 @@ export default {
     this.uploadImg();
   },
   methods: {
+    editorInit: function () {
+            // require('brace/ext/language_  tools') //language extension prerequsite...
+            require('brace/mode/html')  
+            require('brace/mode/css')                
+            require('brace/mode/less')
+            require('brace/theme/monokai')
+            // require('../assets/themes/mytheme')
+
+            require('brace/snippets/javascript') //snippet
+          
+        },
     uploadImg() {
       let imgRef = storageRef.child("img/wG032WYr0zs.jpg");
       imgRef.getDownloadURL().then(function(url) {
@@ -206,9 +212,7 @@ export default {
     //   // };
     //   // console.log(this.getImgUrl);
     // },
-    onFocus() {
-      // this.$refs.cm.cm.focus();
-    },
+
     saveName(name) {
       this.newUser.nameUser = name;
       this.showInstruction = true;
@@ -216,7 +220,6 @@ export default {
     showeditor(showEditor) {
       this.showCodemirror = showEditor;
     },
-    push() {},
     done() {
       const user = usersRef.push(this.newUser);
       this.clear();
@@ -270,9 +273,14 @@ export default {
       return hour % 12 || 12;
     },
     combo() {
-      // this.powerMode();
       let divCount = document.getElementById("count");
       let divBar = document.getElementById("bar");
+      let body = document.getElementById("background");
+      let outputExclamation = document.getElementById("outputExclamation");
+      let name = document.getElementsByClassName('nameTag')[0];
+      let button1 = document.getElementsByClassName("button")[0];
+      let button2 = document.getElementsByClassName("button")[1];
+
 
       divCount.classList.add("bump");
       setTimeout(() => divCount.classList.remove("bump"), 250);
@@ -280,21 +288,39 @@ export default {
       const keyName = event.key;
       if (!this.keyNames.includes(keyName)) {
         this.countSymbols++;
+        clearTimeout(this.powermode)
+        if (this.countSymbols > 200) {
+        body.classList.add("power-mode");
+        divCount.classList.add("power-mode");
+        divBar.classList.add("power-mode");
+        outputExclamation.classList.add('power-mode')
+        button1.classList.add('power-mode')
+        button2.classList.add('power-mode')
+        name.classList.add('power-mode')
+
+        this.powermode = setTimeout(()=>{ body.classList.remove("power-mode");
+        divCount.classList.remove("power-mode");
+        divBar.classList.remove("power-mode")
+        outputExclamation.classList.remove('power-mode')
+        button1.classList.remove('power-mode')
+        button2.classList.remove('power-mode')
+        name.classList.remove('power-mode')},10000)
+      }
+        // this.powerMode();
         divBar.classList.remove("transition");
         setTimeout(() => divBar.classList.add("transition"), 4);
         if (
           this.countSymbols > 0 &&
           this.countSymbols % this.exclamationsEvery == 0
         ) {
-          let excl = document.getElementById("exclamations");
-          const span = document.getElementById("span");
           this.exclamation = Math.floor(
-            Math.random() * this.exclamations.length
+            Math.random() * this.exclamationList.length
           );
-          span.classList.add("exclamation");
-          console.log(span.classList);
-          setTimeout(span.classList.remove("exclamation"), 3000);
-          // setTimeout((this.exclamation = ""), 10000);
+          outputExclamation.classList.add("exclamationAnimation");
+          setTimeout(() => {
+            outputExclamation.classList.remove("exclamationAnimation");
+            this.exclamation = ""
+          }, 1500);
         }
 
         clearTimeout(this.keyTimeout);
@@ -305,11 +331,8 @@ export default {
       if (this.countSymbols > 200) {
         let body = document.getElementById("background");
         body.classList.add("power-mode");
-        // body.classList.add("power-mode-indicator");
-        console.log(body.classList);
+        setTimeout(()=>{ body.classList.remove("power-mode")},10000)
       }
-      clearTimeout(this.keyTimeout);
-      this.keyTimeout = setTimeout(() => (this.countSymbols = 0), 10000);
     }
   }
 };
@@ -340,55 +363,52 @@ export default {
   bottom: 0;
   right: 0;
   background-size: 520px 476px;
+
+  &.power-mode {
+    background-image: url(../../img/logo-power.png);
+    animation: background-power 2s infinite both;
+  }
+}
+.background img {
+  width: 50%;
+  height: 50%;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  
 }
 
 /* editor */
 
 .cm-s-monokai.CodeMirror {
   background: transparent;
-  // height: auto;
   min-height: 97vh;
 }
 .CodeMirror {
   height: auto;
   z-index: 1024;
 }
-.CodeMirror-scroll {
-  height: auto;
-  overflow-y: hidden;
-  overflow-x: auto;
-}
-.CodeMirror-fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: auto;
-  z-index: 9;
-}
-.cm-s-monokai.CodeMirror {
-  background: transparent;
-}
 .CodeMirror-linenumber.CodeMirror-gutter-elt {
   color: #4effa1;
 }
-/* modal */
-
-.inputName {
-  color: #000;
-  font-size: 16px;
-  font-family: "Press Start 2P", sans-serif;
+.ace-monokai {
   background: transparent;
-  border: none;
-  width: 200px;
 }
-.inputName::placeholder {
-  color: #000;
+#editor {
+  position: absolute;
+  max-width: 99%;
+  max-height: 95%;
+  font-size: 16px;
 }
-
 /* buttons */
 
+.buttons {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  position: fixed;
+  z-index: 99999;
+}
 .button {
   font-family: "Press Start 2P", sans-serif;
   appearance: none;
@@ -401,14 +421,13 @@ export default {
   font-size: 16px;
   border-radius: 5px;
   padding: 10px 15px;
+
+  &.power-mode {
+    background: #0df;
+  }
 }
-.buttons {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  position: fixed;
-  z-index: 99999;
-}
+
+/* reference image */
 
 .assetImg {
   position: fixed;
@@ -433,6 +452,7 @@ img {
 img:hover {
   cursor: pointer;
 }
+
 .reference-container {
   position: absolute;
   z-index: 50;
@@ -461,6 +481,21 @@ img:hover {
   margin-top: 0;
   background-size: contain;
 }
+
+.nameTag {
+  background: rgba(58, 147, 100, 0.75);
+  color: #fff;
+  font-size: 56px;
+  position: absolute;
+  right: 25px;
+  top: 0;
+  z-index: 10000;
+
+  &.power-mode {
+    background: #0df;
+  }
+}
+
 .countdown {
   font-family: "Press Start 2P", sans-serif;
   text-align: right;
@@ -496,7 +531,7 @@ h2 {
   color: #fff;
   font-size: 16px;
 }
-.count {
+.countClass {
   font-size: 80px;
   color: #4effa1;
   z-index: 99999;
@@ -504,8 +539,11 @@ h2 {
   &.bump {
     animation: grow 0.25s both;
   }
+  &.power-mode {
+    color: #0df;
+  }
 }
-.bar {
+.barClass {
   position: relative;
   opacity: 0.5;
   margin-top: 23px;
@@ -513,6 +551,10 @@ h2 {
   background: #4effa1;
   width: 100%;
   transform: scaleX(1);
+
+  &.power-mode{
+    background: #0df;
+  }
 }
 .transition {
   transform: scaleX(0);
@@ -521,7 +563,7 @@ h2 {
 
 .exclamations {
   position: absolute;
-  bottom: -50px;
+  bottom: -20px;
   right: 0;
   display: block;
   color: #4effa1;
@@ -529,25 +571,19 @@ h2 {
   font-size: 20px;
   text-align: right;
 }
-.exclamation {
+.exclamationAnimation {
   right: 0;
   top: 0;
   display: block;
   position: absolute;
   min-width: 200px;
-  background: #fff;
   animation: exclamation 1.5s ease-out both;
+
+   &.power-mode {
+    color:#0df;
+  }
 }
 
-.nameTag {
-  background: rgba(58, 147, 100, 0.75);
-  color: #fff;
-  font-size: 56px;
-  position: absolute;
-  right: 20px;
-  top: 0;
-  z-index: 10000;
-}
 .power-mode {
   opacity: 1;
   animation: power-mode-indicator 750ms linear both;
@@ -582,6 +618,8 @@ h2 {
     animation-timing-function: ease-in;
   }
 }
+
+
 </style>
 
 

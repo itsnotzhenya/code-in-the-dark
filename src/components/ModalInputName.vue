@@ -58,6 +58,9 @@ export default {
 </script>
 
 <style scoped>
+.v--modal-overlay {
+  z-index: 999999;
+}
 .inputName {
   color: #000;
   font-size: 16px;

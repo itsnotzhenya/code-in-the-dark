@@ -51,9 +51,8 @@ export default {
 </script>
 
 <style scoped>
-.modal {
-  z-index: 99999;
-  position: relative;
+.v--modal-overlay {
+  z-index: 999999;
 }
 .ok {
   position: absolute;
