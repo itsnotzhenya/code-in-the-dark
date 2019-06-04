@@ -33,12 +33,10 @@ export default {
       this.$modal.show("inputName");
     },
     closed() {
-      let date = new Date().getTime();
       if (this.nameUser == "") {
         this.checkInput();
         return;
       }
-      this.nameUser += date;
       this.$modal.hide("inputName");
       this.$emit("savename", this.nameUser);
     },

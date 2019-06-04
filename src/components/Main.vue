@@ -1,8 +1,7 @@
 <template>
   <div id="app">
-    <div id="background" class="background">
-      <!-- <img  id="bg" src="../../img/logo4.png"> -->
-    </div>
+    <Styles/>
+    <div id="background" class="background"></div>
     <modal-input-name v-if="showInput" v-on:savename="saveName"></modal-input-name>
     <modal-instructions
       @start="timer(seconds)"
@@ -10,18 +9,20 @@
       v-if="showInstruction"
       v-on:showeditor="showeditor"
     ></modal-instructions>
+    <modal name="Layout" :width="'900px'" height="auto">
+      <img :src="assetUrl" class="big-image">
+    </modal>
     <div class="counter" @keydown.exact="combo">
-      <!-- <codemirror
-        v-if="showCodemirror"
-        class="codemirror"
-        ref="cm"
+      <editor
+        id="editor"
+        v-show="showEditor"
         v-model="newUser.codeUser"
-        :options="cmOption"
-        width="800"
-      ></codemirror> -->
-    <editor id="editor" v-model="newUser.codeUser" @init="editorInit" lang="html" theme="monokai"></editor>
+        @init="editorInit"
+        lang="html"
+        theme="monokai"
+      ></editor>
     </div>
-    <div class="nameTag">{{ newUser.nameUser }}</div>
+    <div class="nameTag">{{ newUser.name }}</div>
 
     <div class="countdown">
       <h2>{{ timeLeft }}</h2>
@@ -35,12 +36,7 @@
       </div>
     </div>
     <div class="assetImg">
-      <img
-        id="myimg"
-        :class="{ full: fullWidthImage }"
-        @click="fullWidthImage = !fullWidthImage"
-        alt
-      >
+      <img @click="$modal.show('Layout')" :src="assetUrl" class="small-image">
     </div>
     <div class="buttons">
       <input class="button" type="submit" value="Finish" @click="confirmation()">
@@ -52,14 +48,9 @@
 <script>
 import ModalInputName from "./ModalInputName.vue";
 import ModalInstructions from "./ModalInstructions.vue";
-// language
-import "codemirror/mode/xml/xml.js";
-// theme css
-import "codemirror/theme/monokai.css";
-// autoCloseTags
-import "codemirror/addon/edit/closetag.js";
 import { db, app } from "@/firebase";
-import { setTimeout, clearTimeout } from "timers";
+import { setTimeout, clearTimeout, clearInterval } from "timers";
+import Styles from "./Styles.vue";
 
 let usersRef = db.ref("users");
 let storageRef = app.storage().ref();
@@ -69,15 +60,18 @@ export default {
   components: {
     ModalInputName,
     ModalInstructions,
-    editor: require('vue2-ace-editor'),
+    editor: require("vue2-ace-editor"),
+    Styles
   },
   data() {
     return {
-      urlImg: "",
+      assetUrl: "",
       showInput: false,
       showInstruction: false,
-      showCodemirror: false,
+      showEditor: false,
       url: "",
+      POWERMODE_COUNTER: 200,
+      COMBO_TIMER: 10000,
       keyNames: [
         "Escape",
         "Tab",
@@ -130,103 +124,65 @@ export default {
       fullWidthImage: false,
       errors: [],
       newUser: {
+        name: "",
         nameUser: "",
         codeUser: ""
       },
-      cmOption: {
-        mode: "text/html",
-        theme: "monokai",
-        lineNumbers: true,
-        autofocus: true,
-        autoCloseTags: true,
-        collapseIdentical: false,
-        highlightDifferences: true,
-        viewportMargin: Infinity,
-        lineWrapping: true,
-        blastCode: { effect: 2 }
-      }
+      body: null,
+      name: null,
+      editor: null,
+      divCount: null,
+      divBar: null,
+      outputExclamation: null,
+      button1: null,
+      button2: null,
     };
   },
   mounted() {
     this.showInput = true;
     this.uploadImg();
+    this.getElements()
   },
   methods: {
-    editorInit: function () {
-            // require('brace/ext/language_  tools') //language extension prerequsite...
-            require('brace/mode/html')  
-            require('brace/mode/css')                
-            require('brace/mode/less')
-            require('brace/theme/monokai')
-            // require('../assets/themes/mytheme')
-
-            require('brace/snippets/javascript') //snippet
-          
-        },
-    uploadImg() {
-      let imgRef = storageRef.child("img/wG032WYr0zs.jpg");
-      imgRef.getDownloadURL().then(function(url) {
-        let xhr = new XMLHttpRequest();
-        // xhr.responseType = "blob"; хз зачем
-        xhr.onload = function() {
-          // let blob = xhr.response; и это тоже хз зачем
-        };
-        xhr.open("GET", url);
-        xhr.send();
-        // console.log(url);
-        // Or inserted into an <img> element:
-        let img = document.getElementById("myimg");
-        img.src = url;
-        // this.urlImg = url;
-        // console.log(this.urlImg);
-        // this.url = url;
-      });
+    editorInit: function() {
+      // require('brace/ext/language_  tools') //language extension prerequsite...
+      require("brace/mode/html");
+      require("brace/mode/css");
+      require("brace/mode/less");
+      require("brace/theme/monokai");
+      // require('../assets/themes/mytheme')
+      require("brace/snippets/javascript");
     },
-    // uploadImg() {
-    //   let file = "wG032WYr0zs.jpg";
-    //   let imgRef = storageRef.child("img/wG032WYr0zs.jpg");
-    //   imgRef.on(
-    //     "state_changed",
-    //     function(snapshot) {},
-    //     function(error) {
-    //       console.log("this error");
-    //     },
-    //     function() {
-    //       imgRef.snapshot.ref.getDownloadURL().then(url => {
-    //         this.urlImg = url;
-    //         console.log(this.urlImg);
-    //       });
-    //     }
-    //   );
-    //   // let getImgUrl = function(file) {
-    //   //   imgRef
-    //   //     .getDownloadURL()
-    //   //     .then(function(url) {
-    //   //       console.log(url);
-    //   //       this.urlImg = url;
-    //   //       return url;
-    //   //     })
-    //   //     .catch(function(error) {
-    //   //       console.log("this error");
-    //   //     });
-    //   // };
-    //   // console.log(this.getImgUrl);
-    // },
-
+    uploadImg() {
+      // let imgRef = storageRef.child("img/wG032WYr0zs.jpg");
+      // imgRef.getDownloadURL().then(function(url) {
+      //   let xhr = new XMLHttpRequest();
+      //   xhr.onload = function() {};
+      //   xhr.open("GET", url);
+      //   xhr.send();
+      //   console.log(url);
+      //   this.assetUrl = url;
+      //   console.log(this.assetUrl);
+      // });
+      this.assetUrl =
+        "https://firebasestorage.googleapis.com/v0/b/code-19f91.appspot.com/o/img%2FwG032WYr0zs.jpg?alt=media&token=147dbf9d-543b-46b2-bbc0-25edaaaeb265";
+    },
     saveName(name) {
-      this.newUser.nameUser = name;
+      this.newUser.name = name;
       this.showInstruction = true;
     },
     showeditor(showEditor) {
-      this.showCodemirror = showEditor;
+      this.showEditor = showEditor;
     },
     done() {
+      let date = new Date().getTime();
+      this.newUser.nameUser = this.newUser.name + date;
       const user = usersRef.push(this.newUser);
       this.clear();
       this.$router.push(`/result/${user.key}`);
     },
     clear() {
-      this.newUser.nameUser = this.newUser.codeUser = "";
+      this.newUser.nameUser = this.newUser.codeUser = this.newUser.name = "";
     },
     confirmation() {
       let conf = confirm("Do you want to complete?");
@@ -272,43 +228,28 @@ export default {
       // 15 --> 3
       return hour % 12 || 12;
     },
+    getElements(){
+      this.divCount = document.getElementById("count");
+      this.divBar = document.getElementById("bar");
+      this.body = document.getElementById("background");
+      this.outputExclamation = document.getElementById("outputExclamation");
+      this.name = document.getElementsByClassName("nameTag")[0];
+      this.button1 = document.getElementsByClassName("button")[0];
+      this.button2 = document.getElementsByClassName("button")[1];
+      this.editor = document.getElementById("editor");
+    },
     combo() {
-      let divCount = document.getElementById("count");
-      let divBar = document.getElementById("bar");
-      let body = document.getElementById("background");
-      let outputExclamation = document.getElementById("outputExclamation");
-      let name = document.getElementsByClassName('nameTag')[0];
-      let button1 = document.getElementsByClassName("button")[0];
-      let button2 = document.getElementsByClassName("button")[1];
-
-
-      divCount.classList.add("bump");
-      setTimeout(() => divCount.classList.remove("bump"), 250);
+      this.divCount.classList.add("bump");
+      setTimeout(() => this.divCount.classList.remove("bump"), 250);
 
       const keyName = event.key;
       if (!this.keyNames.includes(keyName)) {
         this.countSymbols++;
-        clearTimeout(this.powermode)
-        if (this.countSymbols > 200) {
-        body.classList.add("power-mode");
-        divCount.classList.add("power-mode");
-        divBar.classList.add("power-mode");
-        outputExclamation.classList.add('power-mode')
-        button1.classList.add('power-mode')
-        button2.classList.add('power-mode')
-        name.classList.add('power-mode')
-
-        this.powermode = setTimeout(()=>{ body.classList.remove("power-mode");
-        divCount.classList.remove("power-mode");
-        divBar.classList.remove("power-mode")
-        outputExclamation.classList.remove('power-mode')
-        button1.classList.remove('power-mode')
-        button2.classList.remove('power-mode')
-        name.classList.remove('power-mode')},10000)
-      }
-        // this.powerMode();
-        divBar.classList.remove("transition");
-        setTimeout(() => divBar.classList.add("transition"), 4);
+        if (this.countSymbols > this.POWERMODE_COUNTER) {
+          this.powermodeOn();
+        }
+        this.divBar.classList.remove("transition");
+        setTimeout(() => this.divBar.classList.add("transition"), 4);
         if (
           this.countSymbols > 0 &&
           this.countSymbols % this.exclamationsEvery == 0
@@ -316,310 +257,41 @@ export default {
           this.exclamation = Math.floor(
             Math.random() * this.exclamationList.length
           );
-          outputExclamation.classList.add("exclamationAnimation");
+          this.outputExclamation.classList.add("exclamationAnimation");
           setTimeout(() => {
-            outputExclamation.classList.remove("exclamationAnimation");
-            this.exclamation = ""
+            this.outputExclamation.classList.remove("exclamationAnimation");
+            this.exclamation = "";
           }, 1500);
         }
 
         clearTimeout(this.keyTimeout);
-        this.keyTimeout = setTimeout(() => (this.countSymbols = 0), 10000);
+        this.keyTimeout = setTimeout(() => {
+          this.countSymbols = 0;
+          this.powermodeOff();
+        }, this.COMBO_TIMER);
       }
     },
-    powerMode() {
-      if (this.countSymbols > 200) {
-        let body = document.getElementById("background");
-        body.classList.add("power-mode");
-        setTimeout(()=>{ body.classList.remove("power-mode")},10000)
-      }
+    powermodeOn() {
+      this.body.classList.add("power-mode");
+      this.divCount.classList.add("power-mode");
+      this.divBar.classList.add("power-mode");
+      this.outputExclamation.classList.add("power-mode");
+      this.button1.classList.add("power-mode");
+      this.button2.classList.add("power-mode");
+      this.name.classList.add("power-mode");
+      this.editor.classList.remove('power')  
+      setTimeout(() => this.editor.classList.add("power"), 4);
+    },
+    powermodeOff() {
+      this.body.classList.remove("power-mode");
+      this.editor.classList.remove("power");
+      this.divCount.classList.remove("power-mode");
+      this.divBar.classList.remove("power-mode");
+      this.outputExclamation.classList.remove("power-mode");
+      this.button1.classList.remove("power-mode");
+      this.button2.classList.remove("power-mode");
+      this.name.classList.remove("power-mode");
     }
   }
 };
 </script>
-
-<style lang="scss">
-@font-face {
-  font-family: "Press Start 2P";
-  src: url(../assets/fonts/PressStart2P.ttf) format("truetype");
-}
-
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  cursor: text;
-}
-.background {
-  background-image: url("../../img/logo4.png");
-  background-color: #000;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  background-attachment: scroll;
-  position: fixed;
-  height: 100vh;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-size: 520px 476px;
-
-  &.power-mode {
-    background-image: url(../../img/logo-power.png);
-    animation: background-power 2s infinite both;
-  }
-}
-.background img {
-  width: 50%;
-  height: 50%;
-  position: absolute;
-  top: 20%;
-  left: 20%;
-  
-}
-
-/* editor */
-
-.cm-s-monokai.CodeMirror {
-  background: transparent;
-  min-height: 97vh;
-}
-.CodeMirror {
-  height: auto;
-  z-index: 1024;
-}
-.CodeMirror-linenumber.CodeMirror-gutter-elt {
-  color: #4effa1;
-}
-.ace-monokai {
-  background: transparent;
-}
-#editor {
-  position: absolute;
-  max-width: 99%;
-  max-height: 95%;
-  font-size: 16px;
-}
-/* buttons */
-
-.buttons {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  position: fixed;
-  z-index: 99999;
-}
-.button {
-  font-family: "Press Start 2P", sans-serif;
-  appearance: none;
-  background-color: #3a9364;
-  margin: 0 10px;
-  box-shadow: none;
-  border: none;
-  cursor: pointer;
-  color: #fff;
-  font-size: 16px;
-  border-radius: 5px;
-  padding: 10px 15px;
-
-  &.power-mode {
-    background: #0df;
-  }
-}
-
-/* reference image */
-
-.assetImg {
-  position: fixed;
-  right: 30px;
-  bottom: 70px;
-  z-index: 1035;
-}
-.full {
-  position: relative;
-  // left: 50%;
-  // top: 50%;
-  width: 100%;
-  height: auto;
-}
-
-img {
-  width: 150px;
-  border-radius: 2px;
-  box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.5);
-}
-
-img:hover {
-  cursor: pointer;
-}
-
-.reference-container {
-  position: absolute;
-  z-index: 50;
-  bottom: 62px;
-  right: 20px;
-  cursor: pointer;
-  color: #fff;
-  text-align: right;
-  font-size: 12px;
-  box-sizing: border-box;
-}
-.reference-screenshot {
-  width: 200px;
-  height: 160px;
-  margin-top: 15px;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
-}
-.active {
-  width: 100%;
-  height: 100%;
-  bottom: 0;
-  left: 0;
-  padding: 25px;
-  margin-top: 0;
-  background-size: contain;
-}
-
-.nameTag {
-  background: rgba(58, 147, 100, 0.75);
-  color: #fff;
-  font-size: 56px;
-  position: absolute;
-  right: 25px;
-  top: 0;
-  z-index: 10000;
-
-  &.power-mode {
-    background: #0df;
-  }
-}
-
-.countdown {
-  font-family: "Press Start 2P", sans-serif;
-  text-align: right;
-  position: fixed;
-  color: #fff;
-  right: 27px;
-  top: 30px;
-  z-index: 99999;
-}
-
-h2 {
-  font-size: 60px;
-  line-height: 1;
-  text-align: center;
-}
-
-.time {
-  display: flex;
-  justify-content: center;
-}
-.combo {
-  font-family: "Press Start 2P", sans-serif;
-  text-align: right;
-  position: fixed;
-  color: #3a9364;
-  right: 27px;
-  top: 150px;
-  font-size: 72px;
-  animation: grow 0.25s both;
-  z-index: 99999;
-}
-.combo p {
-  color: #fff;
-  font-size: 16px;
-}
-.countClass {
-  font-size: 80px;
-  color: #4effa1;
-  z-index: 99999;
-
-  &.bump {
-    animation: grow 0.25s both;
-  }
-  &.power-mode {
-    color: #0df;
-  }
-}
-.barClass {
-  position: relative;
-  opacity: 0.5;
-  margin-top: 23px;
-  height: 8px;
-  background: #4effa1;
-  width: 100%;
-  transform: scaleX(1);
-
-  &.power-mode{
-    background: #0df;
-  }
-}
-.transition {
-  transform: scaleX(0);
-  transition: all 10000ms linear;
-}
-
-.exclamations {
-  position: absolute;
-  bottom: -20px;
-  right: 0;
-  display: block;
-  color: #4effa1;
-  opacity: 0.75;
-  font-size: 20px;
-  text-align: right;
-}
-.exclamationAnimation {
-  right: 0;
-  top: 0;
-  display: block;
-  position: absolute;
-  min-width: 200px;
-  animation: exclamation 1.5s ease-out both;
-
-   &.power-mode {
-    color:#0df;
-  }
-}
-
-.power-mode {
-  opacity: 1;
-  animation: power-mode-indicator 750ms linear both;
-}
-.power-mode-indicator {
-  opacity: 1;
-  animation: power-mode-indicator 750ms linear both;
-}
-
-@keyframes grow {
-  0% {
-    animation-timing-function: ease-out;
-  }
-  50% {
-    transform: scale(1.3);
-    animation-timing-function: ease-in;
-  }
-}
-@keyframes exclamation {
-  100% {
-    opacity: 0;
-    transform: translate3D(0, 100px, 0);
-  }
-}
-
-@keyframes background-power {
-  0% {
-    animation-timing-function: ease-out;
-  }
-  50% {
-    transform: scale(1.5);
-    animation-timing-function: ease-in;
-  }
-}
-
-
-</style>
-
-
