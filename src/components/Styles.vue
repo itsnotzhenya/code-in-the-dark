@@ -574,55 +574,55 @@ h2 {
   0% {
   }
   3.2% {
-    transform: translate(10px, 5px);
+    transform: translate(5px, 2px);
   }
   4.5% {
-    transform: translate(-10px, 5);
+    transform: translate(-2px, 4px);
   }
   6.4% {
-    transform: translate(5px, -10px);
+    transform: translate(2px, 3px);
   }
   9% {
-    transform: translate(10px, 5px);
+    transform: translate(1px, 4px);
   }
   12% {
-    transform: translate(-15px, 10px);
+    transform: translate(-2px, 0px);
   }
   15.5% {
-    transform: translate(10px, 5px);
+    transform: translate(1px, 2px);
   }
   17% {
-    transform: translate(0px, -5px);
+    transform: translate(0px, -1px);
   }
   18.9% {
-    transform: translate(5px, 5px);
+    transform: translate(2px, 4px);
   }
   25% {
-    transform: translate(10px, -10px);
+    transform: translate(1px, -1px);
   }
   29% {
-    transform: translate(0px, 5px);
+    transform: translate(0px, 2px);
   }
   31.4% {
-    transform: translate(-10px, 5px);
+    transform: translate(-1px, 3px);
   }
   40% {
-    transform: translate(0px, 5px);
+    transform: translate(1px, 2px);
   }
   56% {
-    transform: translate(10px, -0px);
+    transform: translate(2px, -2px);
   }
   62% {
-    transform: translate(5px, 5px);
+    transform: translate(1px, 3px);
   }
   81% {
-    transform: translate(0px, -5px);
+    transform: translate(0px, -2px);
   }
   87% {
-    transform: translate(10px, 0px);
+    transform: translate(1px, 0px);
   }
   100% {
-    transform: translate(-10px, 5px);
+    transform: translate(-2px, 1px);
   }
 }
 </style>

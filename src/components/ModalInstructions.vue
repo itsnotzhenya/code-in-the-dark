@@ -1,6 +1,6 @@
 <template>
   <div class="modal">
-    <modal :clickToClose="false" name="instructions" :width="450" :height="210">
+    <modal :clickToClose="false" name="instructions" :width="450" :height="270">
       <pre class="instructions">
                       --- The rules ---
     1) No previews - of either results or assets!
@@ -11,6 +11,7 @@
     prompt instructions to see your results
 
     Good luck and most important of all; have fun!
+    <p id="ref"></p>
       </pre>
       <button id="start" class="ok" @click="start()">
         <i class="fas fa-check"></i>
@@ -20,13 +21,34 @@
 </template>
 
 <script>
+import { db, app } from "@/firebase";
+let taskRef = db.ref("task");
+
 export default {
+  firebase: { task: taskRef },
   name: "instructions",
   data() {
     return {
+      assets: "",
       showEditor: true,
-      timerStart: true
+      timerStart: true,
+      firebase: {
+        taskArr: db.ref("task")
+      }
     };
+  },
+  mounted() {
+    this.opened();
+    // this.assets = this.firebase.taskArr;
+    taskRef.once("value").then(function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        let key = childSnapshot.key;
+        let childData = childSnapshot.val(); // childData will be the actual contents of the child
+
+        let asset = childSnapshot.val().reference;
+        document.getElementById("ref").innerHTML = asset;
+      });
+    });
   },
   methods: {
     opened() {
@@ -43,9 +65,6 @@ export default {
         this.timerStart = false;
       }
     }
-  },
-  mounted() {
-    this.opened();
   }
 };
 </script>
@@ -68,6 +87,9 @@ export default {
   font-size: 16px;
   border-radius: 5px;
   padding: 8px 35px;
+}
+p {
+  margin-left: 15px;
 }
 </style>
 

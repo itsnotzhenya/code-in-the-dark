@@ -71,6 +71,7 @@ export default {
       showEditor: false,
       url: "",
       POWERMODE_COUNTER: 200,
+      POWERMODE_EXTRA: 500,
       COMBO_TIMER: 10000,
       keyNames: [
         "Escape",
