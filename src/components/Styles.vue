@@ -45,8 +45,9 @@
 #editor {
   position: absolute;
   max-width: 99%;
-  max-height: 95%;
+  max-height: 98%;
   font-size: 16px;
+  z-index: 0;
 }
 /* buttons */
 
@@ -55,7 +56,6 @@
   right: 20px;
   bottom: 20px;
   position: fixed;
-  // z-index: 99999;
 }
 .button {
   font-family: "Press Start 2P", sans-serif;
@@ -81,7 +81,6 @@
   position: fixed;
   right: 30px;
   bottom: 70px;
-  // z-index: 1035;
 }
 .full {
   position: relative;
@@ -99,12 +98,12 @@
   cursor: pointer;
 }
 .big-image {
-  width: 900px;
+  width: 700px;
+  object-fit: contain;
 }
 
 .reference-container {
   position: absolute;
-  // z-index: 50;
   bottom: 62px;
   right: 20px;
   cursor: pointer;
@@ -138,7 +137,6 @@
   position: absolute;
   right: 25px;
   top: 0;
-  // z-index: 10000;
   padding: 0px 10px;
 
   &.power-mode {
@@ -153,7 +151,6 @@
   color: #fff;
   right: 27px;
   top: 30px;
-  // z-index: 99999;
 }
 
 h2 {
@@ -175,7 +172,6 @@ h2 {
   top: 150px;
   font-size: 72px;
   animation: grow 0.25s both;
-  // z-index: 99999;
 }
 .combo p {
   color: #fff;
@@ -184,7 +180,6 @@ h2 {
 .countClass {
   font-size: 80px;
   color: #4effa1;
-  // z-index: 99999;
 
   &.bump {
     animation: grow 0.25s both;

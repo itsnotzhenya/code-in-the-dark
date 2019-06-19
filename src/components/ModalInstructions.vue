@@ -1,7 +1,8 @@
 <template>
   <div class="modal">
-    <modal :clickToClose="false" name="instructions" :width="450" :height="270">
-      <pre class="instructions">
+    <modal :clickToClose="false" name="instructions" :width="450" :height="300">
+      <div id="container">
+        <pre class="instructions">
                       --- The rules ---
     1) No previews - of either results or assets!
     2) Stay in this editor at all times
@@ -11,17 +12,19 @@
     prompt instructions to see your results
 
     Good luck and most important of all; have fun!
-    <p id="ref"></p>
       </pre>
-      <button id="start" class="ok" @click="start()">
-        <i class="fas fa-check"></i>
-      </button>
+    <p class="ref">{{asset}}</p>
+
+        <button id="start" class="ok" @click="start()">
+          <i class="fas fa-check"></i>
+        </button>
+      </div>
     </modal>
   </div>
 </template>
 
 <script>
-import { db, app } from "@/firebase";
+import { db } from "@/firebase";
 let taskRef = db.ref("task");
 
 export default {
@@ -30,6 +33,7 @@ export default {
   data() {
     return {
       assets: "",
+      asset: "",
       showEditor: true,
       timerStart: true,
       firebase: {
@@ -39,20 +43,18 @@ export default {
   },
   mounted() {
     this.opened();
-    // this.assets = this.firebase.taskArr;
-    taskRef.once("value").then(function(snapshot) {
-      snapshot.forEach(function(childSnapshot) {
-        let key = childSnapshot.key;
-        let childData = childSnapshot.val(); // childData will be the actual contents of the child
-
-        let asset = childSnapshot.val().reference;
-        document.getElementById("ref").innerHTML = asset;
-      });
-    });
   },
   methods: {
+    async getRef() {
+      const snapshot = await taskRef.once('value')
+        snapshot.forEach((childSnapshot) => {
+          this.asset = childSnapshot.val().reference;
+        });
+    },
     opened() {
       this.$modal.show("instructions");
+      this.getRef()
+
     },
     closed() {
       this.$modal.hide("instructions");
@@ -71,7 +73,7 @@ export default {
 
 <style scoped>
 .v--modal-overlay {
-  z-index: 999999;
+  /* z-index: 999999; */
 }
 .ok {
   position: absolute;
@@ -88,8 +90,9 @@ export default {
   border-radius: 5px;
   padding: 8px 35px;
 }
-p {
+.ref {
   margin-left: 15px;
+  width: 420px;
 }
 </style>
 

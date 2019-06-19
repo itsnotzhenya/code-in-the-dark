@@ -9,7 +9,7 @@
       v-if="showInstruction"
       v-on:showeditor="showeditor"
     ></modal-instructions>
-    <modal name="Layout" :width="'900px'" height="auto">
+    <modal name="Layout" :width="'700px'" height="auto">
       <img :src="assetUrl" class="big-image">
     </modal>
     <div class="counter" @keydown.exact="combo">
@@ -120,7 +120,7 @@ export default {
       exclamationsEvery: 10,
       exclamation: "",
       countSymbols: 0,
-      seconds: 10,
+      seconds: 900,
       timeLeft: "00:00",
       fullWidthImage: false,
       errors: [],
@@ -146,12 +146,10 @@ export default {
   },
   methods: {
     editorInit: function() {
-      // require('brace/ext/language_  tools') //language extension prerequsite...
       require("brace/mode/html");
       require("brace/mode/css");
       require("brace/mode/less");
       require("brace/theme/monokai");
-      // require('../assets/themes/mytheme')
       require("brace/snippets/javascript");
     },
     uploadImg() {
@@ -166,7 +164,7 @@ export default {
       //   console.log(this.assetUrl);
       // });
       this.assetUrl =
-        "https://firebasestorage.googleapis.com/v0/b/code-19f91.appspot.com/o/img%2FwG032WYr0zs.jpg?alt=media&token=147dbf9d-543b-46b2-bbc0-25edaaaeb265";
+        "https://firebasestorage.googleapis.com/v0/b/code-19f91.appspot.com/o/task%2Fphotoeditorsdk-export.png?alt=media&token=3c739828-55be-49e7-87f4-25f4c4638f48";
     },
     saveName(name) {
       this.newUser.name = name;
@@ -179,7 +177,7 @@ export default {
       let date = new Date().getTime();
       this.newUser.nameUser = this.newUser.name + date;
       const user = usersRef.push(this.newUser);
-      this.clear();
+      // this.clear();
       this.$router.push(`/result/${user.key}`);
     },
     clear() {
