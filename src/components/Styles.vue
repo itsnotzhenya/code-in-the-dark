@@ -98,10 +98,13 @@
   cursor: pointer;
 }
 .big-image {
-  width: 700px;
+  width: 800px;
   object-fit: contain;
 }
 
+.contrainer {
+  object-fit: contain;
+}
 .reference-container {
   position: absolute;
   bottom: 62px;

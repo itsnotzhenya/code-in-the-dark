@@ -9,8 +9,10 @@
       v-if="showInstruction"
       v-on:showeditor="showeditor"
     ></modal-instructions>
-    <modal name="Layout" :width="'700px'" height="auto">
-      <img :src="assetUrl" class="big-image">
+    <modal name="Layout" :width="'800px'" height="auto">
+      <div class="container">
+        <img :src="assetUrl" class="big-image">
+      </div>
     </modal>
     <div class="counter" @keydown.exact="combo">
       <editor
@@ -136,13 +138,13 @@ export default {
       divBar: null,
       outputExclamation: null,
       button1: null,
-      button2: null,
+      button2: null
     };
   },
   mounted() {
     this.showInput = true;
     this.uploadImg();
-    this.getElements()
+    this.getElements();
   },
   methods: {
     editorInit: function() {
@@ -153,16 +155,6 @@ export default {
       require("brace/snippets/javascript");
     },
     uploadImg() {
-      // let imgRef = storageRef.child("img/wG032WYr0zs.jpg");
-      // imgRef.getDownloadURL().then(function(url) {
-      //   let xhr = new XMLHttpRequest();
-      //   xhr.onload = function() {};
-      //   xhr.open("GET", url);
-      //   xhr.send();
-      //   console.log(url);
-      //   this.assetUrl = url;
-      //   console.log(this.assetUrl);
-      // });
       this.assetUrl =
         "https://firebasestorage.googleapis.com/v0/b/code-19f91.appspot.com/o/task%2Fphotoeditorsdk-export.png?alt=media&token=3c739828-55be-49e7-87f4-25f4c4638f48";
     },
@@ -177,7 +169,7 @@ export default {
       let date = new Date().getTime();
       this.newUser.nameUser = this.newUser.name + date;
       const user = usersRef.push(this.newUser);
-      // this.clear();
+      this.clear();
       this.$router.push(`/result/${user.key}`);
     },
     clear() {
@@ -227,7 +219,7 @@ export default {
       // 15 --> 3
       return hour % 12 || 12;
     },
-    getElements(){
+    getElements() {
       this.divCount = document.getElementById("count");
       this.divBar = document.getElementById("bar");
       this.body = document.getElementById("background");
@@ -278,7 +270,7 @@ export default {
       this.button1.classList.add("power-mode");
       this.button2.classList.add("power-mode");
       this.name.classList.add("power-mode");
-      this.editor.classList.remove('power')  
+      this.editor.classList.remove("power");
       setTimeout(() => this.editor.classList.add("power"), 4);
     },
     powermodeOff() {
