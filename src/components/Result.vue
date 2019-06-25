@@ -6,7 +6,6 @@
 
 <script>
 import { app, db } from "@/firebase";
-// import { constants } from "crypto";
 export default {
   data() {
     return {
